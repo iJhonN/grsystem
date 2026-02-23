@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Ou "mysql" se preferir
+  url      = env("DATABASE_URL")
+}
+
+model OrdemServico {
+  id              String   @id @default(uuid())
+  numeroOs        String   @unique
+  placa           String
+  modelo          String
+  ano             Int
+  statusMacro     String   // 🔵 Entrada, 🟡 Produção, etc
+  statusDetalhado String   // 📦 Aguardando Peças, etc
+  cidade          String
+  secretaria      String
+  
+  // Relações dinâmicas para múltiplos profissionais
+  mecanicos       Mecanico[]
+  ajudantes       Ajudante[]
+  gestores        Gestor[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Mecanico {
+  id        String       @id @default(uuid())
+  nome      String
+  os        OrdemServico @relation(fields: [osId], references: [id])
+  osId      String
+}
+
+model Ajudante {
+  id        String       @id @default(uuid())
+  nome      String
+  os        OrdemServico @relation(fields: [osId], references: [id])
+  osId      String
+}
+
+model Gestor {
+  id        String       @id @default(uuid())
+  nome      String
+  os        OrdemServico @relation(fields: [osId], references: [id])
+  osId      String
+}
